@@ -1,0 +1,1 @@
+This is a placeholder for animal_checkins_positive.md

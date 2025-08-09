@@ -1,0 +1,1 @@
+This is a placeholder for offline_mode_trigger_conditions.md
