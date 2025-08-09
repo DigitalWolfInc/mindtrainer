@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../domain/checkin_entry.dart';
-import '../domain/animal_mood.dart';
 
 class CheckinStorage {
   static const String _keyCheckins = 'animal_checkins';
