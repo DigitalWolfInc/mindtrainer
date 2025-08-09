@@ -18,7 +18,7 @@ class AnimalCheckinScreen extends StatelessWidget {
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Thanks for sharing how you\'re feeling like a ${mood.name}!'),
+          content: Text('Thanks for sharing that you\'re feeling like a ${mood.name}!'),
           backgroundColor: Colors.green,
         ),
       );

@@ -114,7 +114,7 @@ class _FocusSessionScreenState extends State<FocusSessionScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Reset Session'),
-        content: const Text('Reset the current session?'),
+        content: const Text('Start fresh with a new session?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),

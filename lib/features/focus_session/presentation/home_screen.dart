@@ -3,6 +3,7 @@ import 'focus_session_screen.dart';
 import 'history_screen.dart';
 import '../../mood_checkin/presentation/animal_checkin_screen.dart';
 import '../../mood_checkin/presentation/checkin_history_screen.dart';
+import '../../language_audit/presentation/language_audit_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -75,6 +76,21 @@ class HomeScreen extends StatelessWidget {
                   );
                 },
                 child: const Text('View Check-in History'),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 48),
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const LanguageAuditScreen(),
+                    ),
+                  );
+                },
+                child: const Text('Language Safety Check'),
               ),
             ],
           ),
