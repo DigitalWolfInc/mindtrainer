@@ -4,7 +4,7 @@
 Flutter application for mental training and cognitive exercises.
 
 ## Context Sources
-Before proposing features, wording, or architecture, consult docs/memory_core_v1/ and its contents. All development must align with System_Ethics_&_Safety.md, Pricing_Strategy.md, and any UX flow documents within this folder.
+Before proposing features, wording, or architecture, consult docs/memory_core_v1/ and its contents. All development must align with System_Ethics_&_Safety.md, Pricing_Strategy.md, and any UX flow documents within this folder. Also consult docs/DECISIONS.md for all confirmed product decisions before implementing or modifying features.
 
 ## Development Commands
 - `flutter run` - Run the app in debug mode
