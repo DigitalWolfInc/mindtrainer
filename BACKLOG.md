@@ -2,7 +2,7 @@
 
 ## Phase 1: Must-Have Core
 
-### 1. Animal-Based Mood Check-ins
+### 1. Animal-Based Mood Check-ins ✅ DONE
 **Goal:** Implement positive, animal-themed emotional state tracking to replace clinical mood assessments.
 
 **Sources:**
@@ -10,11 +10,14 @@
 - `docs/memory_core_v1/mindtrainer_memory_core_v1/System_Ethics_&_Safety/trauma_safe_language_guide.md`
 
 **Acceptance Criteria:**
-- User can select from 5+ animal states (e.g., energetic rabbit, calm turtle, curious cat)
-- Each selection saves timestamp and animal choice to local storage
-- UI uses only positive, non-clinical language
-- Check-in screen accessible from home screen
-- History view shows past week of animal selections
+- ✅ User can select from 6 animal states (energetic rabbit, calm turtle, curious cat, wise owl, playful dolphin, gentle deer)
+- ✅ Each selection saves timestamp and animal choice to local storage (SharedPreferences)
+- ✅ UI uses only positive, non-clinical language ("How are you feeling?" vs medical terms)
+- ✅ Check-in screen accessible from home screen via "Animal Check-in" button
+- ✅ History view shows past week of animal selections
+
+**Implementation:** Commit `83edf42` 
+**Files:** `lib/features/mood_checkin/domain/animal_mood.dart`, `lib/features/mood_checkin/domain/checkin_entry.dart`, `lib/features/mood_checkin/data/checkin_storage.dart`, `lib/features/mood_checkin/presentation/animal_checkin_screen.dart`, `lib/features/mood_checkin/presentation/checkin_history_screen.dart`, `lib/features/focus_session/presentation/home_screen.dart`, `test/animal_mood_test.dart`
 
 ### 2. Trauma-Safe Language Audit
 **Goal:** Review and update all UI text to ensure trauma-informed, supportive language throughout the app.
