@@ -4,6 +4,7 @@ import 'history_screen.dart';
 import '../../mood_checkin/presentation/animal_checkin_screen.dart';
 import '../../mood_checkin/presentation/checkin_history_screen.dart';
 import '../../language_audit/presentation/language_audit_screen.dart';
+import '../../settings/presentation/settings_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -91,6 +92,21 @@ class HomeScreen extends StatelessWidget {
                   );
                 },
                 child: const Text('Language Safety Check'),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 48),
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const SettingsScreen(),
+                    ),
+                  );
+                },
+                child: const Text('Settings'),
               ),
             ],
           ),
