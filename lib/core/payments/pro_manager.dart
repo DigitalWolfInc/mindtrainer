@@ -118,3 +118,126 @@ class DefaultProGate {
     'Ad-free experience',
   ];
 }
+
+/// Enhanced Pro feature gate that can work with any Pro status source
+class ProFeatureGate {
+  /// Check if Pro features are currently available
+  final bool Function() _isProActive;
+  
+  const ProFeatureGate(this._isProActive);
+  
+  /// Create gate from ProManager
+  factory ProFeatureGate.fromProManager(ProManager manager) {
+    return ProFeatureGate(() => manager.isProActive);
+  }
+  
+  /// Create gate from Play Billing Pro Manager
+  factory ProFeatureGate.fromPlayBillingManager(dynamic manager) {
+    // Using dynamic to avoid import dependencies
+    return ProFeatureGate(() => manager.isProActive);
+  }
+  
+  /// Create gate with direct status check
+  factory ProFeatureGate.fromStatusCheck(bool Function() isActive) {
+    return ProFeatureGate(isActive);
+  }
+  
+  /// Whether Pro features are currently active
+  bool get isActive => _isProActive();
+  
+  /// Feature availability checks
+  bool get unlimitedSessions => isActive;
+  bool get advancedInsights => isActive;
+  bool get dataExport => isActive;
+  bool get coachingFeatures => isActive;
+  bool get premiumThemes => isActive;
+  bool get adFree => isActive;
+  
+  /// Check if a specific feature is available
+  bool isFeatureAvailable(ProFeature feature) {
+    switch (feature) {
+      case ProFeature.unlimitedSessions:
+        return unlimitedSessions;
+      case ProFeature.advancedInsights:
+        return advancedInsights;
+      case ProFeature.dataExport:
+        return dataExport;
+      case ProFeature.coachingFeatures:
+        return coachingFeatures;
+      case ProFeature.premiumThemes:
+        return premiumThemes;
+      case ProFeature.adFree:
+        return adFree;
+    }
+  }
+  
+  /// Get list of all Pro features
+  List<String> get allFeatures => [
+    'Unlimited focus sessions',
+    'Advanced insights and analytics',
+    'Data export and backup',
+    'AI coaching conversations',
+    'Premium themes and customization',
+    'Ad-free experience',
+  ];
+  
+  /// Get list of currently available features
+  List<String> get availableFeatures {
+    if (!isActive) return [];
+    return allFeatures;
+  }
+  
+  /// Get list of locked features (when not Pro)
+  List<String> get lockedFeatures {
+    if (isActive) return [];
+    return allFeatures;
+  }
+}
+
+/// Enumeration of Pro features for type-safe checking
+enum ProFeature {
+  unlimitedSessions,
+  advancedInsights,
+  dataExport,
+  coachingFeatures,
+  premiumThemes,
+  adFree,
+}
+
+extension ProFeatureExtension on ProFeature {
+  /// Human-readable feature name
+  String get displayName {
+    switch (this) {
+      case ProFeature.unlimitedSessions:
+        return 'Unlimited Focus Sessions';
+      case ProFeature.advancedInsights:
+        return 'Advanced Insights';
+      case ProFeature.dataExport:
+        return 'Data Export';
+      case ProFeature.coachingFeatures:
+        return 'AI Coaching';
+      case ProFeature.premiumThemes:
+        return 'Premium Themes';
+      case ProFeature.adFree:
+        return 'Ad-Free Experience';
+    }
+  }
+  
+  /// Feature description for UI
+  String get description {
+    switch (this) {
+      case ProFeature.unlimitedSessions:
+        return 'No limits on daily focus sessions';
+      case ProFeature.advancedInsights:
+        return 'Detailed analytics and correlations';
+      case ProFeature.dataExport:
+        return 'Export data to JSON/CSV';
+      case ProFeature.coachingFeatures:
+        return 'Personalized AI coaching conversations';
+      case ProFeature.premiumThemes:
+        return 'Exclusive themes and customization';
+      case ProFeature.adFree:
+        return 'Remove all advertisements';
+    }
+  }
+}
