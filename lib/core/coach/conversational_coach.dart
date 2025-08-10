@@ -39,6 +39,8 @@
 
 import 'dart:math';
 
+import 'coach_events.dart';
+
 /// Current user state snapshot for personalization
 class UserSnapshot {
   final DateTime now;
@@ -114,6 +116,7 @@ class ConversationalCoach {
   final ProfileSource _profile;
   final HistorySource _history;
   final JournalSink _journal;
+  final CoachEventSink _eventSink;
   
   // State tracking
   CoachPhase _currentPhase = CoachPhase.stabilize;
@@ -125,15 +128,17 @@ class ConversationalCoach {
     required ProfileSource profile,
     required HistorySource history, 
     required JournalSink journal,
+    CoachEventSink? eventSink,
   }) : _profile = profile,
        _history = history,
-       _journal = journal;
+       _journal = journal,
+       _eventSink = eventSink ?? _noOpEventSink;
   
   /// Advance conversation with optional user reply from previous turn
   CoachStep next({String? userReply, CoachPhase? forcePhase}) {
     final snapshot = _profile.snapshot();
     
-    // Record user reply if provided
+    // Record user reply if provided and emit coaching event
     if (userReply != null && userReply.trim().isNotEmpty) {
       _journal.append(JournalEntry(snapshot.now, userReply));
       _lastUserReply = userReply;
@@ -142,6 +147,28 @@ class ConversationalCoach {
       if (!_hasOpenedUp && _isOpen(userReply)) {
         _hasOpenedUp = true;
       }
+      
+      // Generate the coaching step for current phase before advancement
+      final stepForEvent = _generateStep(snapshot);
+      
+      // Determine outcome if this response completes a phase
+      final outcome = _determinePhaseOutcome(_currentPhase, stepForEvent);
+      
+      // Auto-suggest tags from the user reply
+      final suggestedTags = _suggestTags(userReply);
+      
+      // Generate stable prompt ID for analytics
+      final promptId = _generatePromptId(_currentPhase, _getPromptsForPhase(_currentPhase), snapshot.now);
+      
+      // Emit coach event
+      _eventSink(CoachEvent.create(
+        at: snapshot.now,
+        phase: _currentPhase.name,
+        promptId: promptId,
+        guidance: stepForEvent.guidance,
+        outcome: outcome,
+        tags: suggestedTags,
+      ));
       
       // Increment step count when user responds
       _phaseStep++;
@@ -604,5 +631,125 @@ class ConversationalCoach {
     } else {
       return "This positive mindset is a strength you can build on.";
     }
+  }
+  
+  /// Auto-suggest tags from user reply content using deterministic keyword matching
+  /// 
+  /// Maps common emotional and mental themes to standardized tags.
+  /// Returns deduplicated lowercase snake_case tags, limited to ≤6 tags.
+  List<String> _suggestTags(String reply) {
+    final text = reply.toLowerCase();
+    final words = text.split(RegExp(r'\W+'));
+    final tagSet = <String>{};
+    
+    // Anxiety and stress patterns
+    if (_containsAny(words, ['anxious', 'anxiety', 'worried', 'worry', 'nervous', 'panic', 'panicking', 'stressed', 'stress'])) {
+      tagSet.add('anxiety');
+    }
+    if (_containsAny(words, ['panic', 'panicking', 'panicked'])) {
+      tagSet.add('panic');
+    }
+    if (_containsAny(words, ['overwhelmed', 'overwhelming', 'too', 'much', 'swamped', 'everything'])) {
+      tagSet.add('overwhelm');
+    }
+    
+    // Energy and mood patterns
+    if (_containsAny(words, ['tired', 'exhausted', 'drained', 'low', 'energy', 'fatigue'])) {
+      tagSet.add('low_energy');
+    }
+    if (_containsAny(words, ['sleep', 'sleeping', 'insomnia', 'sleepless', 'awake'])) {
+      tagSet.add('sleep');
+    }
+    
+    // Positive emotional patterns
+    if (_containsAny(words, ['grateful', 'thankful', 'appreciate', 'blessed', 'lucky'])) {
+      tagSet.add('gratitude');
+    }
+    if (_containsAny(words, ['compassion', 'kind', 'gentle', 'understanding', 'forgive'])) {
+      tagSet.add('self_compassion');
+    }
+    
+    // Cognitive patterns
+    if (_containsAny(words, ['ruminating', 'rumination', 'thinking', 'overthinking', 'obsessing'])) {
+      tagSet.add('rumination');
+    }
+    if (_containsAny(words, ['focus', 'concentration', 'distracted', 'scattered', 'restart'])) {
+      tagSet.add('focus_restart');
+    }
+    
+    // Return limited and sorted list for deterministic output
+    return tagSet.take(6).toList()..sort();
+  }
+  
+  /// Check if any of the target words appear in the word list
+  bool _containsAny(List<String> words, List<String> targets) {
+    return words.any((word) => targets.contains(word));
+  }
+  
+  /// Generate stable prompt ID for analytics
+  String _generatePromptId(CoachPhase phase, List<CoachPrompt> prompts, DateTime now) {
+    final index = _selectPromptIndex(prompts, now);
+    return '${phase.name}_$index';
+  }
+  
+  /// Get the index that would be selected for deterministic prompt selection
+  int _selectPromptIndex(List<CoachPrompt> prompts, DateTime now) {
+    final dayHash = (now.day * 7 + now.month * 11) ^ (now.year % 100);
+    return dayHash % prompts.length;
+  }
+  
+  /// Determine if the current user interaction completes a coaching phase
+  CoachOutcome? _determinePhaseOutcome(CoachPhase phase, CoachStep step) {
+    // Outcomes are determined by phase transitions that will happen after this response
+    switch (phase) {
+      case CoachPhase.stabilize:
+        if (_phaseStep >= 2 || (_phaseStep >= 1 && _hasOpenedUp)) {
+          return CoachOutcome.stabilized;
+        }
+        return null;
+      case CoachPhase.open:
+        if (_hasOpenedUp || _phaseStep >= 3) {
+          return CoachOutcome.opened;
+        }
+        return null;
+      case CoachPhase.reflect:
+        return CoachOutcome.reframed; // Reflect always advances to reframe
+      case CoachPhase.reframe:
+        return CoachOutcome.reframed; // Reframe processing complete
+      case CoachPhase.plan:
+        return CoachOutcome.planned; // Plan commitment received
+      case CoachPhase.close:
+        return CoachOutcome.closed; // Full session complete
+    }
+  }
+  
+  /// Get prompts for a specific coaching phase
+  List<CoachPrompt> _getPromptsForPhase(CoachPhase phase) {
+    switch (phase) {
+      case CoachPhase.stabilize:
+        return _getStabilizePrompts();
+      case CoachPhase.open:
+        return _getOpenPrompts();
+      case CoachPhase.reflect:
+        return _getReflectPrompts();
+      case CoachPhase.reframe:
+        return [_getReframePrompt()];
+      case CoachPhase.plan:
+        // Plan prompts vary by user state, return a representative list
+        return [
+          const CoachPrompt(CoachPhase.plan, "What's one small thing you could do in the next 5 minutes?"),
+          const CoachPrompt(CoachPhase.plan, "You're making good progress. What would feel most supportive right now?"),
+        ];
+      case CoachPhase.close:
+        // Close prompts vary by user state, return a representative list  
+        return [
+          const CoachPrompt(CoachPhase.close, "Before we finish, what's one thing you're grateful for today?"),
+        ];
+    }
+  }
+  
+  /// No-op event sink for when event emission is disabled
+  static void _noOpEventSink(CoachEvent event) {
+    // Do nothing
   }
 }
