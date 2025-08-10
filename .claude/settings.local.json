@@ -6,7 +6,8 @@
       "Bash(flutter test:*)",
       "Bash(mkdir:*)",
       "Bash(git add:*)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(dart:*)"
     ],
     "deny": []
   }
