@@ -26,4 +26,16 @@ MindTrainer is a Flutter-based app for mental training, cognitive exercises, and
 - Third-party integrations.
 - Advanced analytics (only with explicit user consent).
 
+## Mood Score Mapping
+For cross-feature insights (mood ↔ focus correlation), animal moods are mapped to numeric scores on a 1-10 scale where higher scores indicate moods associated with higher energy/focus potential:
+
+- **Energetic Rabbit** (🐰): 9.0 - High energy, ready for action
+- **Curious Cat** (🐱): 8.0 - Active interest and engagement  
+- **Playful Dolphin** (🐬): 7.0 - Fun-seeking, moderately active
+- **Wise Owl** (🦉): 6.0 - Thoughtful, contemplative
+- **Gentle Deer** (🦌): 4.0 - Quiet, gentle energy
+- **Calm Turtle** (🐢): 3.0 - Low energy, peaceful pace
+
+This mapping is used in `lib/features/insights/domain/mood_focus_insights.dart` for computing Pearson correlation between daily mood scores and focus session minutes.
+
 Purpose: This file is a single, ongoing record of confirmed product decisions so future sessions and contributors can get up to speed instantly.

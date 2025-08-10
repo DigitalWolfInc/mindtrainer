@@ -1,6 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../../../core/time_format.dart';
+import '../domain/focus_session_state.dart';
+import '../domain/focus_session_repository.dart';
+import '../data/focus_session_repository_impl.dart';
+import 'session_completion_dialog.dart';
 
 // TODO: restore to 25 * 60 before release
 const int kDefaultSessionSeconds = 10;
@@ -14,21 +18,14 @@ class FocusSessionScreen extends StatefulWidget {
 
 class _FocusSessionScreenState extends State<FocusSessionScreen> {
   Timer? _timer;
-  int _remainingSeconds = kDefaultSessionSeconds;
-  bool _isRunning = false;
+  FocusSessionState _sessionState = FocusSessionState.idle(kDefaultSessionSeconds * 1000);
+  late final FocusSessionRepository _repository;
 
   @override
   void initState() {
     super.initState();
-    _clearTestData(); // TEMP: remove after testing
-    _loadSavedTimer();
-  }
-
-  // TEMP: remove after testing
-  Future<void> _clearTestData() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('timer_end_time');
-    await prefs.remove('session_history');
+    _repository = FocusSessionRepositoryImpl();
+    _loadActiveSession();
   }
 
   @override
@@ -37,84 +34,72 @@ class _FocusSessionScreenState extends State<FocusSessionScreen> {
     super.dispose();
   }
 
-  Future<void> _loadSavedTimer() async {
-    final prefs = await SharedPreferences.getInstance();
-    final savedEndTime = prefs.getString('timer_end_time');
-    
-    if (savedEndTime != null) {
-      final endTime = DateTime.parse(savedEndTime);
-      final now = DateTime.now();
+  Future<void> _loadActiveSession() async {
+    final activeSession = await _repository.loadActiveSession();
+    if (activeSession != null) {
+      setState(() {
+        _sessionState = activeSession;
+      });
       
-      if (endTime.isAfter(now)) {
-        final remaining = endTime.difference(now).inSeconds;
-        setState(() {
-          _remainingSeconds = remaining;
-          _isRunning = true;
-        });
+      if (_sessionState.status == FocusSessionStatus.running) {
         _startTimer();
-      } else {
-        await _clearSavedTimer();
       }
     }
   }
 
-  Future<void> _saveEndTime() async {
-    final prefs = await SharedPreferences.getInstance();
-    final endTime = DateTime.now().add(Duration(seconds: _remainingSeconds));
-    await prefs.setString('timer_end_time', endTime.toIso8601String());
-  }
-
-  Future<void> _clearSavedTimer() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('timer_end_time');
-  }
-
-  Future<void> _logCompletedSession() async {
-    final prefs = await SharedPreferences.getInstance();
-    final now = DateTime.now();
-    final sessionRecord = '${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')} ${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}|${(kDefaultSessionSeconds ~/ 60).toString()}';
-    
-    final history = prefs.getStringList('session_history') ?? [];
-    history.insert(0, sessionRecord);
-    await prefs.setStringList('session_history', history);
+  Future<void> _saveActiveSession() async {
+    if (_sessionState.status == FocusSessionStatus.idle || 
+        _sessionState.status == FocusSessionStatus.completed) {
+      await _repository.clearActiveSession();
+    } else {
+      await _repository.saveActiveSession(_sessionState);
+    }
   }
 
   void _startTimer() {
-    if (_remainingSeconds > 0) {
-      if (!_isRunning) {
-        setState(() {
-          _isRunning = true;
-        });
-        _saveEndTime();
-      }
-      _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-        setState(() {
-          if (_remainingSeconds > 0) {
-            _remainingSeconds--;
-          } else {
-            _timer?.cancel();
-            _isRunning = false;
-            _clearSavedTimer();
-            _logCompletedSession();
-          }
-        });
-      });
-    }
-  }
-
-  void _pauseTimer() {
     _timer?.cancel();
-    setState(() {
-      _isRunning = false;
+    
+    _timer = Timer.periodic(const Duration(milliseconds: 100), (timer) async {
+      setState(() {
+        _sessionState = _sessionState.tick();
+      });
+      
+      if (_sessionState.status == FocusSessionStatus.completed) {
+        await _onSessionCompleted();
+      }
     });
   }
 
-  Future<void> _resetTimer() async {
+  Future<void> _onStart() async {
+    setState(() {
+      _sessionState = _sessionState.start();
+    });
+    await _saveActiveSession();
+    _startTimer();
+  }
+
+  Future<void> _onPause() async {
+    _timer?.cancel();
+    setState(() {
+      _sessionState = _sessionState.pause();
+    });
+    await _saveActiveSession();
+  }
+
+  Future<void> _onResume() async {
+    setState(() {
+      _sessionState = _sessionState.start();
+    });
+    await _saveActiveSession();
+    _startTimer();
+  }
+
+  Future<void> _onComplete() async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Reset Session'),
-        content: const Text('Start fresh with a new session?'),
+        title: const Text('Complete Session'),
+        content: const Text('Mark this session as completed?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -122,7 +107,7 @@ class _FocusSessionScreenState extends State<FocusSessionScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Reset'),
+            child: const Text('Complete'),
           ),
         ],
       ),
@@ -130,18 +115,114 @@ class _FocusSessionScreenState extends State<FocusSessionScreen> {
 
     if (confirmed == true) {
       _timer?.cancel();
-      _clearSavedTimer();
       setState(() {
-        _remainingSeconds = kDefaultSessionSeconds;
-        _isRunning = false;
+        _sessionState = _sessionState.complete();
       });
+      await _onSessionCompleted();
     }
   }
 
-  String _formatTime(int seconds) {
-    final minutes = seconds ~/ 60;
-    final remainingSeconds = seconds % 60;
-    return '${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
+  Future<void> _onCancel() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Cancel Session'),
+        content: const Text('Cancel this session and start fresh?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('No'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Cancel Session'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      _timer?.cancel();
+      setState(() {
+        _sessionState = _sessionState.cancel();
+      });
+      await _saveActiveSession();
+    }
+  }
+
+  Future<void> _onSessionCompleted() async {
+    _timer?.cancel();
+    
+    final durationMinutes = (_sessionState.elapsedMs / 60000).round();
+    
+    final metadata = await showDialog<SessionMetadata>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const SessionCompletionDialog(),
+    );
+    
+    await _repository.saveCompletedSession(
+      completedAt: DateTime.now(),
+      durationMinutes: durationMinutes,
+      tags: metadata?.tags,
+      note: metadata?.note,
+    );
+    await _repository.clearActiveSession();
+  }
+
+  String _getDisplayTime() {
+    final remainingMs = _sessionState.currentRemainingMs;
+    final duration = Duration(milliseconds: remainingMs);
+    return formatDuration(duration);
+  }
+
+  Widget _buildStartButton() {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        minimumSize: const Size(double.infinity, 48),
+      ),
+      onPressed: _sessionState.status == FocusSessionStatus.idle ? _onStart : null,
+      child: const Text('Start'),
+    );
+  }
+
+  Widget _buildPauseResumeButton() {
+    final isRunning = _sessionState.status == FocusSessionStatus.running;
+    final isPaused = _sessionState.status == FocusSessionStatus.paused;
+    
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        minimumSize: const Size(double.infinity, 48),
+      ),
+      onPressed: isRunning ? _onPause : (isPaused ? _onResume : null),
+      child: Text(isRunning ? 'Pause' : 'Resume'),
+    );
+  }
+
+  Widget _buildCompleteButton() {
+    final canComplete = _sessionState.status == FocusSessionStatus.running ||
+                       _sessionState.status == FocusSessionStatus.paused;
+    
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        minimumSize: const Size(double.infinity, 48),
+      ),
+      onPressed: canComplete ? _onComplete : null,
+      child: const Text('Complete'),
+    );
+  }
+
+  Widget _buildCancelButton() {
+    final canCancel = _sessionState.status != FocusSessionStatus.idle &&
+                     _sessionState.status != FocusSessionStatus.completed;
+    
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        minimumSize: const Size(double.infinity, 48),
+      ),
+      onPressed: canCancel ? _onCancel : null,
+      child: const Text('Cancel'),
+    );
   }
 
   @override
@@ -157,36 +238,20 @@ class _FocusSessionScreenState extends State<FocusSessionScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                _formatTime(_remainingSeconds),
+                _getDisplayTime(),
                 style: const TextStyle(
                   fontSize: 48,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 16),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 48),
-                ),
-                onPressed: _isRunning ? null : _startTimer,
-                child: const Text('Start'),
-              ),
+              _buildStartButton(),
               const SizedBox(height: 16),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 48),
-                ),
-                onPressed: _isRunning ? _pauseTimer : null,
-                child: const Text('Pause'),
-              ),
+              _buildPauseResumeButton(),
               const SizedBox(height: 16),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 48),
-                ),
-                onPressed: _resetTimer,
-                child: const Text('Reset'),
-              ),
+              _buildCompleteButton(),
+              const SizedBox(height: 16),
+              _buildCancelButton(),
             ],
           ),
         ),

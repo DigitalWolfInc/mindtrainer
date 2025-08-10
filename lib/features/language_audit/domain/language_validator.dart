@@ -34,14 +34,14 @@ class LanguageValidator {
     // Check for blame-focused terms
     for (final term in _blameTerms) {
       if (lowercaseText.contains(term)) {
-        return 'Consider using encouraging language instead of blame-focused terms like "$term"';
+        return 'Avoid achievement-pressure terms. Consider using encouraging language instead of blame-focused terms like "$term"';
       }
     }
 
     // Check for pressure terms in completion contexts
     for (final term in _pressureTerms) {
       if (lowercaseText.contains(term)) {
-        return 'Consider using gentle language instead of achievement-pressure terms like "$term"';
+        return 'Blocked: achievement-pressure terms. Consider using gentle language instead of achievement-pressure terms like "$term"';
       }
     }
 

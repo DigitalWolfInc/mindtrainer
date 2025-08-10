@@ -12,6 +12,7 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _notificationsEnabled = true;
   String _themeMode = 'system';
+  int _weeklyGoalMinutes = AppSettings.defaultWeeklyGoalMinutes;
 
   @override
   void initState() {
@@ -24,6 +25,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() {
       _notificationsEnabled = prefs.getBool(AppSettings.keyNotificationsEnabled) ?? true;
       _themeMode = prefs.getString(AppSettings.keyThemeMode) ?? 'system';
+      _weeklyGoalMinutes = prefs.getInt(AppSettings.keyWeeklyGoalMinutes) ?? AppSettings.defaultWeeklyGoalMinutes;
     });
   }
 
@@ -40,6 +42,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await prefs.setString(AppSettings.keyThemeMode, value);
     setState(() {
       _themeMode = value;
+    });
+  }
+
+  Future<void> _saveWeeklyGoalSetting(int value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(AppSettings.keyWeeklyGoalMinutes, value);
+    setState(() {
+      _weeklyGoalMinutes = value;
     });
   }
 
@@ -135,6 +145,36 @@ class _SettingsScreenState extends State<SettingsScreen> {
               subtitle: const Text('Optional notifications for check-ins (stored locally)'),
               value: _notificationsEnabled,
               onChanged: _saveNotificationSetting,
+            ),
+            
+            const SizedBox(height: 16),
+            
+            ListTile(
+              title: const Text('Weekly Focus Goal'),
+              subtitle: Text('${_weeklyGoalMinutes} minutes per week'),
+              trailing: SizedBox(
+                width: 120,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      onPressed: _weeklyGoalMinutes > 60 ? () => _saveWeeklyGoalSetting(_weeklyGoalMinutes - 30) : null,
+                      icon: const Icon(Icons.remove),
+                    ),
+                    Expanded(
+                      child: Text(
+                        '${_weeklyGoalMinutes}m',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: _weeklyGoalMinutes < 1440 ? () => _saveWeeklyGoalSetting(_weeklyGoalMinutes + 30) : null,
+                      icon: const Icon(Icons.add),
+                    ),
+                  ],
+                ),
+              ),
             ),
             
             const SizedBox(height: 16),

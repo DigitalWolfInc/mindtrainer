@@ -12,4 +12,8 @@ class AppSettings {
   static const String keyUserPreferences = 'user_preferences';
   static const String keyThemeMode = 'theme_mode';
   static const String keyNotificationsEnabled = 'notifications_enabled';
+  static const String keyWeeklyGoalMinutes = 'weekly_goal_minutes';
+  
+  // Focus session defaults
+  static const int defaultWeeklyGoalMinutes = 300;
 }

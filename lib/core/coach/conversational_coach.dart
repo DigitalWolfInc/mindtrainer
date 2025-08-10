@@ -41,6 +41,17 @@ import 'dart:math';
 
 import 'coach_events.dart';
 
+/// Clock abstraction for testable time
+abstract class Clock {
+  DateTime now();
+}
+
+/// System clock using real time
+class SystemClock implements Clock {
+  @override
+  DateTime now() => DateTime.now();
+}
+
 /// Current user state snapshot for personalization
 class UserSnapshot {
   final DateTime now;
@@ -117,6 +128,7 @@ class ConversationalCoach {
   final HistorySource _history;
   final JournalSink _journal;
   final CoachEventSink _eventSink;
+  final Clock _clock;
   
   // State tracking
   CoachPhase _currentPhase = CoachPhase.stabilize;
@@ -129,10 +141,12 @@ class ConversationalCoach {
     required HistorySource history, 
     required JournalSink journal,
     CoachEventSink? eventSink,
+    Clock? clock,
   }) : _profile = profile,
        _history = history,
        _journal = journal,
-       _eventSink = eventSink ?? _noOpEventSink;
+       _eventSink = eventSink ?? _noOpEventSink,
+       _clock = clock ?? SystemClock();
   
   /// Advance conversation with optional user reply from previous turn
   CoachStep next({String? userReply, CoachPhase? forcePhase}) {
@@ -140,7 +154,8 @@ class ConversationalCoach {
     
     // Record user reply if provided and emit coaching event
     if (userReply != null && userReply.trim().isNotEmpty) {
-      _journal.append(JournalEntry(snapshot.now, userReply));
+      final now = _clock.now();
+      _journal.append(JournalEntry(now, userReply));
       _lastUserReply = userReply;
       
       // Check if user has opened up for phase progression
@@ -158,11 +173,11 @@ class ConversationalCoach {
       final suggestedTags = _suggestTags(userReply);
       
       // Generate stable prompt ID for analytics
-      final promptId = _generatePromptId(_currentPhase, _getPromptsForPhase(_currentPhase), snapshot.now);
+      final promptId = _generatePromptId(_currentPhase, _getPromptsForPhase(_currentPhase), now);
       
       // Emit coach event
       _eventSink(CoachEvent.create(
-        at: snapshot.now,
+        at: now,
         phase: _currentPhase.name,
         promptId: promptId,
         guidance: stepForEvent.guidance,
