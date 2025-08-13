@@ -5,14 +5,17 @@
 
 import 'dart:async';
 import 'play_billing_adapter.dart';
+import 'real_play_billing_adapter.dart';
 import 'pro_catalog.dart';
 import 'pro_status.dart';
 import 'subscription_gateway.dart';
+import '../../payments/entitlement_resolver.dart';
 
 /// Pro Manager with Play Billing integration
 class PlayBillingProManager {
   final PlayBillingAdapter _adapter;
   final ProCatalog _baseCatalog;
+  final EntitlementResolver _entitlementResolver;
   
   StreamSubscription<List<BillingPurchase>>? _purchaseSubscription;
   StreamSubscription<BillingConnectionState>? _connectionSubscription;
@@ -25,8 +28,28 @@ class PlayBillingProManager {
   final StreamController<PurchaseEvent> _purchaseEventController =
       StreamController<PurchaseEvent>.broadcast();
   
-  PlayBillingProManager(this._adapter, this._baseCatalog)
+  PlayBillingProManager(this._adapter, this._baseCatalog, this._entitlementResolver)
       : _catalog = _baseCatalog;
+  
+  /// Factory constructor that uses the appropriate billing adapter based on build mode
+  factory PlayBillingProManager.create(ProCatalog catalog) {
+    final adapter = PlayBillingAdapterFactory.create();
+    return PlayBillingProManager(adapter, catalog, EntitlementResolver.instance);
+  }
+  
+  /// Factory constructor for testing with fake adapter
+  factory PlayBillingProManager.fake(ProCatalog catalog, {
+    bool simulateConnectionFailure = false,
+    bool simulatePurchaseFailure = false,
+    bool simulateUserCancel = false,
+  }) {
+    final adapter = PlayBillingAdapterFactory.createFake(
+      simulateConnectionFailure: simulateConnectionFailure,
+      simulatePurchaseFailure: simulatePurchaseFailure,
+      simulateUserCancel: simulateUserCancel,
+    );
+    return PlayBillingProManager(adapter, catalog, EntitlementResolver.instance);
+  }
   
   /// Current Pro status
   ProStatus get currentStatus => _currentStatus;
@@ -38,7 +61,7 @@ class PlayBillingProManager {
   BillingConnectionState get connectionState => _connectionState;
   
   /// Whether Pro features are currently active
-  bool get isProActive => _currentStatus.isPro && !_currentStatus.isExpired;
+  bool get isProActive => _entitlementResolver.isPro;
   
   /// Stream of purchase events (for testing and UI feedback)
   Stream<PurchaseEvent> get purchaseEventStream => _purchaseEventController.stream;
@@ -46,6 +69,9 @@ class PlayBillingProManager {
   /// Initialize the manager and connect to Play Billing
   Future<bool> initialize() async {
     try {
+      // Initialize entitlement resolver first
+      await _entitlementResolver.initialize();
+      
       // Set up connection state monitoring
       _connectionSubscription = _adapter.connectionStateStream.listen((state) {
         _connectionState = state;
@@ -170,28 +196,39 @@ class PlayBillingProManager {
   
   /// Process purchase updates from billing service
   void _processPurchaseUpdates(List<BillingPurchase> purchases) {
-    // Find active Pro purchases
+    // Convert billing purchases to purchase info maps
+    final purchaseInfos = purchases.map((p) => {
+      'purchaseToken': p.purchaseToken,
+      'productId': p.productId,
+      'purchaseState': p.state == PurchaseState.purchased ? 'purchased' : 
+                     p.state == PurchaseState.pending ? 'pending' : 'cancelled',
+      'purchaseTime': p.purchaseTime,
+      'acknowledged': p.acknowledged,
+      'source': 'play_billing',
+      'autoRenewing': p.autoRenewing,
+    }).toList();
+    
+    // Process through entitlement resolver
+    _entitlementResolver.processReceiptsFromBilling(purchaseInfos);
+    
+    // Update legacy ProStatus for backward compatibility
+    final entitlement = _entitlementResolver.currentEntitlement;
+    if (entitlement.isPro && !entitlement.isExpired) {
+      _currentStatus = ProStatus.activePro(
+        expiresAt: entitlement.until,
+        autoRenewing: true, // Assume auto-renewing for active subscriptions
+      );
+    } else {
+      _currentStatus = const ProStatus.free();
+    }
+    
+    // Emit purchase events for active purchases
     final activePurchases = purchases.where((p) => 
         p.state == PurchaseState.purchased &&
         (_catalog.findPlanById(p.productId) != null)
     ).toList();
     
-    if (activePurchases.isNotEmpty) {
-      // User has active Pro subscription
-      final purchase = activePurchases.first; // Take the first active one
-      final plan = _catalog.findPlanById(purchase.productId);
-      
-      final expiresAt = plan?.period == ProPlanPeriod.monthly
-          ? DateTime.fromMillisecondsSinceEpoch(purchase.purchaseTime)
-              .add(const Duration(days: 30))
-          : DateTime.fromMillisecondsSinceEpoch(purchase.purchaseTime)
-              .add(const Duration(days: 365));
-      
-      _currentStatus = ProStatus.activePro(
-        expiresAt: expiresAt,
-        autoRenewing: purchase.autoRenewing,
-      );
-      
+    for (final purchase in activePurchases) {
       _emitPurchaseEvent(PurchaseEvent.completed(
         productId: purchase.productId,
         purchaseToken: purchase.purchaseToken,
@@ -201,9 +238,6 @@ class PlayBillingProManager {
       if (!purchase.acknowledged) {
         _adapter.acknowledgePurchase(purchase.purchaseToken);
       }
-    } else {
-      // No active Pro subscription
-      _currentStatus = const ProStatus.free();
     }
   }
   

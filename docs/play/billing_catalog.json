@@ -1,0 +1,58 @@
+{
+  "product_catalog": {
+    "subscription_products": [
+      {
+        "product_id": "pro_monthly",
+        "base_plan_id": "base_monthly_v1",
+        "title": "MindTrainer Pro Monthly",
+        "description": "Unlock advanced focus analytics and unlimited sessions with monthly billing",
+        "currency": "USD",
+        "price_micros": 9990000,
+        "billing_period": "P1M",
+        "free_trial": {
+          "enabled": false,
+          "period": "P7D"
+        },
+        "grace_period": "P3D",
+        "product_type": "subscription",
+        "status": "active"
+      },
+      {
+        "product_id": "pro_yearly",
+        "base_plan_id": "base_yearly_v1",
+        "title": "MindTrainer Pro Yearly",
+        "description": "Unlock advanced focus analytics and unlimited sessions with yearly billing - Save 20%!",
+        "currency": "USD",
+        "price_micros": 95990000,
+        "billing_period": "P1Y",
+        "free_trial": {
+          "enabled": false,
+          "period": "P7D"
+        },
+        "grace_period": "P3D",
+        "product_type": "subscription",
+        "status": "active"
+      }
+    ]
+  },
+  "upgrade_downgrade_rules": {
+    "pro_monthly_to_yearly": {
+      "type": "upgrade",
+      "proration_mode": "immediate_with_time_proration",
+      "replacement_mode": "with_time_proration"
+    },
+    "pro_yearly_to_monthly": {
+      "type": "downgrade",
+      "proration_mode": "deferred",
+      "replacement_mode": "deferred"
+    }
+  },
+  "catalog_metadata": {
+    "version": "1.0",
+    "last_updated": "2025-01-11",
+    "currency_default": "USD",
+    "supported_countries": ["US", "CA", "GB", "AU", "DE", "FR", "ES", "IT", "JP"],
+    "minimum_android_version": "21",
+    "billing_api_version": "6.0"
+  }
+}

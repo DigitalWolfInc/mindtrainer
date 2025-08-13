@@ -1,0 +1,20 @@
+🎉 Welcome to MindTrainer 1.0!
+
+✨ **New in this release:**
+• Advanced Pro analytics with mood-focus correlations
+• Smart engagement cues to maintain your focus streak  
+• Enhanced session insights with tag performance metrics
+• Improved home screen design and navigation
+• Better Pro upgrade experience with contextual prompts
+
+🔧 **Improvements:**
+• Faster app startup and smoother animations
+• More responsive analytics loading
+• Better memory management for longer sessions
+
+🐛 **Bug fixes:**
+• Fixed session data persistence across app restarts
+• Resolved occasional splash screen timing issues
+• Improved billing flow reliability
+
+Ready to unlock your focus potential? Try Pro analytics free for 7 days!

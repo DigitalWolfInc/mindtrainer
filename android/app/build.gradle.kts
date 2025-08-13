@@ -42,3 +42,11 @@ android {
 flutter {
     source = "../.."
 }
+
+dependencies {
+    // Google Play Billing Library for subscription management
+    implementation("com.android.billingclient:billing-ktx:6.1.0")
+    
+    // Coroutines support for async billing operations
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+}

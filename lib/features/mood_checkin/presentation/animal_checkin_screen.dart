@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../domain/animal_mood.dart';
 import '../domain/checkin_entry.dart';
 import '../data/checkin_storage.dart';
+import '../../../achievements/achievements_resolver.dart';
 
 class AnimalCheckinScreen extends StatelessWidget {
   const AnimalCheckinScreen({super.key});
@@ -15,6 +16,12 @@ class AnimalCheckinScreen extends StatelessWidget {
     final storage = CheckinStorage();
     await storage.saveCheckin(entry);
     
+    // Extract species from mood ID for achievements
+    final species = _extractSpecies(mood.id);
+    if (species != null) {
+      await AchievementsResolver.instance.resolveAnimalCheckin(species);
+    }
+    
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -24,6 +31,15 @@ class AnimalCheckinScreen extends StatelessWidget {
       );
       Navigator.pop(context);
     }
+  }
+
+  String? _extractSpecies(String moodId) {
+    // Extract species from mood IDs like 'energetic_rabbit' -> 'rabbit'
+    final parts = moodId.split('_');
+    if (parts.length >= 2) {
+      return parts.last; // Last part is the species
+    }
+    return null;
   }
 
   @override

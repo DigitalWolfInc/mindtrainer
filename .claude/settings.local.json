@@ -7,7 +7,23 @@
       "Bash(mkdir:*)",
       "Bash(git add:*)",
       "Bash(git reset:*)",
-      "Bash(dart:*)"
+      "Bash(dart:*)",
+      "Bash(flutter analyze:*)",
+      "Bash(flutter build:*)",
+      "Bash(mv:*)",
+      "Bash(flutter clean:*)",
+      "Bash(flutter pub:*)",
+      "Bash(./gradlew:*)",
+      "Bash(.gradlew:*)",
+      "Bash(gradlew:*)",
+      "Bash(kotlinc:*)",
+      "Bash(rm:*)",
+      "Bash(flutter run:*)",
+      "Bash(timeout 30 flutter test:*)",
+      "Bash(timeout 30 flutter analyze lib/favorites/)",
+      "Bash(del test_prompt.txt)",
+      "Bash(flutter:*)",
+      "Bash(del test_debug.dart)"
     ],
     "deny": []
   }

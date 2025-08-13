@@ -2,6 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../achievements/achievements_store.dart';
+import '../../../achievements/snapshot.dart';
+import '../../../achievements/badge.dart';
 
 class IOResult {
   final bool success;
@@ -95,9 +98,16 @@ class FocusSessionIOService {
   static Future<IOResult> exportJson(String path) async {
     try {
       final sessions = await _loadAllSessions();
+      
+      // Export achievements alongside sessions
+      final achievementsStore = AchievementsStore.instance;
+      await achievementsStore.init();
+      final achievements = achievementsStore.snapshot.toJson();
+      
       final jsonContent = jsonEncode({
         'exportTimestamp': DateTime.now().toIso8601String(),
         'sessions': sessions,
+        'achievements': achievements,
       });
       
       final file = File(path);
@@ -135,13 +145,63 @@ class FocusSessionIOService {
           .where((session) => !existingKeys.contains('${session['start']}_${session['durationMinutes']}'))
           .toList();
       
-      if (newSessions.isEmpty) {
-        return const IOResult.success(data: 'No new sessions to import');
+      // Import achievements if present
+      int importedBadges = 0;
+      if (data.containsKey('achievements')) {
+        try {
+          final achievementsStore = AchievementsStore.instance;
+          await achievementsStore.init();
+          
+          final importAchievements = AchievementsSnapshot.fromJson(
+            data['achievements'] as Map<String, dynamic>
+          );
+          
+          final currentSnapshot = achievementsStore.snapshot;
+          final mergedBadges = <String, Badge>{};
+          
+          // Add existing badges
+          mergedBadges.addAll(currentSnapshot.unlocked);
+          
+          // Merge imported badges (newest unlockedAt wins on conflicts)
+          for (final badge in importAchievements.badges) {
+            final existing = mergedBadges[badge.id];
+            if (existing == null || badge.unlockedAt.isAfter(existing.unlockedAt)) {
+              mergedBadges[badge.id] = badge;
+            }
+          }
+          
+          // Count newly imported badges
+          importedBadges = mergedBadges.length - currentSnapshot.count;
+          
+          final mergedSnapshot = AchievementsSnapshot.create(
+            unlocked: mergedBadges,
+            updatedAt: DateTime.now(),
+          );
+          
+          await achievementsStore.replaceAll(mergedSnapshot);
+        } catch (e) {
+          // Log error but don't fail the entire import
+          debugPrint('Failed to import achievements: $e');
+        }
       }
       
-      await _saveImportedSessions(newSessions);
+      if (newSessions.isEmpty && importedBadges == 0) {
+        return const IOResult.success(data: 'No new data to import');
+      }
       
-      return IOResult.success(data: 'Imported ${newSessions.length} new sessions');
+      if (newSessions.isNotEmpty) {
+        await _saveImportedSessions(newSessions);
+      }
+      
+      final messages = <String>[];
+      if (newSessions.isNotEmpty) {
+        messages.add('${newSessions.length} sessions');
+      }
+      if (importedBadges > 0) {
+        messages.add('$importedBadges badges');
+      }
+      
+      return IOResult.success(data: 'Imported ${messages.join(' and ')}');
     } catch (e) {
       return IOResult.error('Failed to import JSON: $e');
     }

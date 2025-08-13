@@ -13,6 +13,10 @@ import '../domain/io_service.dart';
 import '../../insights/domain/mood_focus_insights.dart';
 import '../../insights/presentation/mood_focus_details_screen.dart';
 import '../../mood_checkin/data/checkin_storage.dart';
+import '../../../core/feature_flags.dart';
+import '../../../domain/focus/focus_stats.dart';
+import '../../focus_timer/focus_stats_controller.dart';
+import '../../../i18n/strings.g.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -69,6 +73,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
       focusSessions: sessions,
     );
     
+    // Load new focus stats if feature enabled
+    FocusStats? focusStats;
+    if (FeatureFlags.focusStatsEnabled) {
+      try {
+        focusStats = await FocusStatsController.instance.repository.getStats();
+      } catch (e) {
+        focusStats = FocusStats.zero; // Fallback on error
+      }
+    }
+    
     _updateAvailableTags(sessions);
     
     return {
@@ -77,6 +91,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       'insights': insights,
       'weeklyProgress': weeklyProgress,
       'moodFocusInsights': moodFocusInsights,
+      'focusStats': focusStats,
     };
   }
 
@@ -312,6 +327,105 @@ class _HistoryScreenState extends State<HistoryScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// Build focus stats header card (v1 feature-flagged)
+  Widget? _buildFocusStatsCard(FocusStats stats) {
+    if (!FeatureFlags.focusStatsEnabled) return null;
+
+    final strings = context.strings;
+    
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.analytics_outlined, size: 20, color: Theme.of(context).primaryColor),
+                const SizedBox(width: 8),
+                Text(
+                  'Focus Stats', // TODO: strings.focus_stats_title when i18n is added
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildStatTile(
+                    value: '${stats.totalMinutes}',
+                    label: 'Total Focus Time', // TODO: strings.focus_stats_total
+                    unit: 'min',
+                    semanticLabel: 'Total focus time, ${stats.totalMinutes} minutes',
+                  ),
+                ),
+                Expanded(
+                  child: _buildStatTile(
+                    value: '${stats.averageMinutes}',
+                    label: 'Average Session', // TODO: strings.focus_stats_average
+                    unit: 'min',
+                    semanticLabel: 'Average session, ${stats.averageMinutes} minutes',
+                  ),
+                ),
+                Expanded(
+                  child: _buildStatTile(
+                    value: '${stats.sessionCount}',
+                    label: 'Sessions', // TODO: strings.focus_stats_sessions
+                    unit: '',
+                    semanticLabel: 'Sessions completed, ${stats.sessionCount}',
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Saved locally', // TODO: strings.focus_stats_saved_locally_hint
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Build individual stat tile with accessibility
+  Widget _buildStatTile({
+    required String value,
+    required String label,
+    required String unit,
+    required String semanticLabel,
+  }) {
+    return Semantics(
+      label: semanticLabel,
+      child: Column(
+        children: [
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              unit.isEmpty ? value : '$value $unit',
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 12),
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
       ),
     );
   }
@@ -639,10 +753,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
             final insights = data['insights'] as FocusSessionInsights? ?? FocusSessionInsights.empty();
             final weeklyProgress = data['weeklyProgress'] as WeeklyProgress? ?? WeeklyProgress.empty();
             final moodFocusInsights = data['moodFocusInsights'] as MoodFocusInsightsResult? ?? const MoodFocusInsightsResult(dailyPairs: [], weeklyCorrelation: null, topFocusMoods: []);
+            final focusStats = data['focusStats'] as FocusStats? ?? FocusStats.zero;
             
             if (allSessions.isEmpty) {
               return Column(
                 children: [
+                  if (_buildFocusStatsCard(focusStats) != null) _buildFocusStatsCard(focusStats)!,
                   _buildWeeklyProgressCard(weeklyProgress),
                   _buildInsightsCard(insights, moodFocusInsights),
                   _buildStatisticsCard(statistics),
@@ -657,6 +773,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
             return Column(
               children: [
+                if (_buildFocusStatsCard(focusStats) != null) _buildFocusStatsCard(focusStats)!,
                 _buildWeeklyProgressCard(weeklyProgress),
                 _buildFilterSection(),
                 _buildInsightsCard(insights, moodFocusInsights),

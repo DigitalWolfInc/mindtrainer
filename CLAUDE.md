@@ -1,24 +1,51 @@
-# MindTrainer Flutter App
+# Claude Operating Guide — MindTrainer (Flutter)
 
-## Project Overview
-Flutter application for mental training and cognitive exercises.
+## How to work
+- Make **small, focused patches** (1–3 files).
+- **Only** touch files I name. If more are required, ask first.
+- Don’t reformat whole files. Change only what’s needed to meet the goal.
+- Keep public APIs as-is unless explicitly told to change them.
+- Every patch must compile and keep current behavior stable.
 
-## Context Sources
-Before proposing features, wording, or architecture, consult docs/memory_core_v1/ and its contents. All development must align with System_Ethics_&_Safety.md, Pricing_Strategy.md, and any UX flow documents within this folder. Also consult docs/DECISIONS.md for all confirmed product decisions before implementing or modifying features.
+## Project layout (initial)
+- Entry: `lib/main.dart`
+- App code goes under `lib/`
+- If a new area is needed, create a folder under `lib/features/<name>/`
+- Shared helpers go under `lib/core/` (create it if missing)
 
-## Development Commands
-- `flutter run` - Run the app in debug mode
-- `flutter build` - Build the app for production
-- `flutter test` - Run unit and widget tests
-- `flutter doctor` - Check Flutter installation and dependencies
-- If a requested change touches ethics/safety, confirm with System_Ethics_&_Safety.md before editing UI copy.
-- Prefer local-first features; if cloud or subscriptions are required, ask once before adding any remote dependency.
+## UI rules
+- Respect existing spacing/typography.
+- Tap targets ≥ 44x44.
+- Keep animations subtle.
 
-## Project Structure
-- `lib/` - Main Dart source code
-- `test/` - Test files
-- `pubspec.yaml` - Dependencies and project configuration
-- Platform-specific folders: `android/`, `ios/`, `web/`, `windows/`, `linux/`, `macos/`
+## Errors & logs
+- No `print` in production code.
+- If logging is needed, write a tiny helper in `lib/core/logging.dart`.
 
-## Dependencies
-See `pubspec.yaml` for current dependencies.
+## Tests
+- If logic (not just UI) changes, add or update a small test.
+
+## Git hygiene
+- One topic per commit, with a clear subject (e.g., `feat: add app bar title`).
+
+## When unsure
+- Ask one clarifying question, then do the **smallest safe change**.
+
+## Request format I will use
+- **Intent**: what should change for the user.
+- **Scope**: exact file(s) to touch.
+- **Acceptance**: bullet list of what must be true after the change.
+We’re working on MindTrainer.
+
+Current status:
+- All Flutter tests are passing, including the LanguageValidator fix.
+- Project structure: lib/core, lib/features/[feature], docs/CLAUDE.md, docs/DECISIONS.md, docs/memory_core_v1.
+- No BACKLOG.md file exists.
+
+Your task:
+- Implement focus session statistics tracking:
+  • Track total focus time (in minutes)
+  • Track average session length
+  • Track number of completed sessions
+- Persist data so stats remain after app restart.
+- Display these stats in history_screen.dart under lib/features/f
