@@ -1,23 +1,30 @@
 {
   "permissions": {
     "allow": [
-      "Bash(flutter doctor:*)",
-      "Bash(sdkmanager:*)",
-      "Bash(C:UsersDeAdZoNeAppDataLocalAndroidSdkcmdline-toolslatestbinsdkmanager.bat --list)",
-      "Bash(./gradlew:*)",
-      "Bash(flutter create:*)",
-      "Bash(dir)",
-      "Bash(dir:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(flutter test:*)",
+      "Bash(mkdir:*)",
+      "Bash(git add:*)",
+      "Bash(git reset:*)",
+      "Bash(dart:*)",
+      "Bash(flutter analyze:*)",
+      "Bash(flutter build:*)",
+      "Bash(mv:*)",
       "Bash(flutter clean:*)",
       "Bash(flutter pub:*)",
-      "Bash(flutter build:*)",
+      "Bash(./gradlew:*)",
+      "Bash(.gradlew:*)",
+      "Bash(gradlew:*)",
+      "Bash(kotlinc:*)",
+      "Bash(rm:*)",
       "Bash(flutter run:*)",
-      "Bash(taskkill:*)",
-      "Bash(flutter config:*)",
-      "Bash(git init:*)",
-      "Bash(git add:*)"
+      "Bash(timeout 30 flutter test:*)",
+      "Bash(timeout 30 flutter analyze lib/favorites/)",
+      "Bash(del test_prompt.txt)",
+      "Bash(flutter:*)",
+      "Bash(del test_debug.dart)"
     ],
-    "deny": [],
-    "ask": []
+    "deny": []
   }
 }

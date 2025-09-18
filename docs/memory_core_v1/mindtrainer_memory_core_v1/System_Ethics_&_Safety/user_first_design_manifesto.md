@@ -1,0 +1,1 @@
+This is a placeholder for user_first_design_manifesto.md

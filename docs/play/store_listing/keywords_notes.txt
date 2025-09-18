@@ -1,0 +1,75 @@
+# MindTrainer - App Store Optimization Keywords
+
+## Primary Keywords (High Search Volume)
+- meditation
+- focus
+- mindfulness
+- concentration
+- productivity
+- mental health
+- wellness
+
+## Secondary Keywords (Medium Search Volume) 
+- focus training
+- meditation app
+- mindfulness app
+- concentration improvement
+- mental clarity
+- cognitive training
+- attention training
+
+## Long-tail Keywords (Specific Intent)
+- mood tracking app
+- focus session timer
+- meditation analytics
+- mindfulness progress tracking
+- concentration exercises
+- focus habit building
+- mental performance tracking
+
+## Competitor Analysis Keywords
+- headspace alternative
+- calm app alternative
+- meditation timer
+- focus app premium
+- mindfulness tracker
+- mood journal app
+
+## Niche/Unique Keywords
+- focus analytics
+- mood focus correlation
+- session insights
+- concentration data
+- mindfulness metrics
+- focus performance tracking
+
+## Seasonal/Trending Keywords
+- new year meditation (January)
+- back to school focus (August/September)
+- exam preparation (April/May, November/December)
+- workplace wellness
+- remote work productivity
+
+## Geographic/Localization Notes
+- Include "meditation" translations for international markets
+- Consider cultural meditation practices (mindfulness, zen, etc.)
+- Wellness vs. wellbeing variations by region
+
+## Internal Notes for ASO
+- Focus on "analytics" and "insights" as differentiators
+- Emphasize "free" core features vs. "premium" analytics
+- Avoid medical claims or therapeutic language
+- Keep descriptions scannable with bullet points
+- Update keywords based on Play Console search insights
+
+## Keyword Density Guidelines
+- Primary keywords: 3-5% density in description
+- Avoid keyword stuffing (sounds unnatural)
+- Use variations and synonyms naturally
+- Include keywords in feature bullets when relevant
+
+## Competitive Positioning
+- Position as "analytics-focused" meditation app
+- Target users interested in "data-driven" self-improvement
+- Appeal to "quantified self" community
+- Emphasize privacy-first approach as differentiator

@@ -1,0 +1,223 @@
+key,en,es
+# App Identity
+app_name,MindTrainer,MindTrainer
+app_subtitle,Focus Training for Mental Clarity,Entrenamiento de Concentración para Claridad Mental
+
+# Splash Screen
+splash_loading,Loading...,Cargando...
+splash_initializing,Initializing MindTrainer,Inicializando MindTrainer
+
+# Start Screen
+start_welcome,Welcome to MindTrainer,Bienvenido a MindTrainer
+start_begin_journey,Begin Your Focus Journey,Comienza Tu Viaje de Concentración
+start_first_session,Start Your First Session,Comienza Tu Primera Sesión
+start_continue_training,Continue Training,Continuar Entrenamiento
+
+# Session Flow
+session_title,Focus Session,Sesión de Concentración
+session_duration,Duration,Duración
+session_quality_rating,How was your focus?,¿Cómo estuvo tu concentración?
+session_notes_placeholder,Session notes (optional),Notas de sesión (opcional)
+session_tags_placeholder,Add tags...,Agregar etiquetas...
+session_save,Save Session,Guardar Sesión
+session_discard,Discard,Descartar
+
+# Quality Ratings
+quality_excellent,Excellent,Excelente
+quality_very_good,Very Good,Muy Bueno
+quality_good,Good,Bueno
+quality_fair,Fair,Regular
+quality_poor,Poor,Pobre
+
+# Coach System
+coach_welcome,Hello! I'm your focus coach,¡Hola! Soy tu entrenador de concentración
+coach_first_tip,Start with short 10-minute sessions,Comienza con sesiones cortas de 10 minutos
+coach_streak_motivation,Great streak! Keep it going,¡Gran racha! Sigue así
+coach_improvement_tip,Try focusing on your breathing,Intenta concentrarte en tu respiración
+coach_goal_reminder,Don't forget your weekly goal,No olvides tu meta semanal
+
+# Goals & Streaks
+goal_weekly,Weekly Goal,Meta Semanal
+goal_sessions_per_week,sessions per week,sesiones por semana
+goal_current_progress,Current Progress,Progreso Actual
+goal_completed,Goal Completed!,¡Meta Completada!
+streak_daily,Daily Streak,Racha Diaria
+streak_weekly,Weekly Streak,Racha Semanal
+streak_days,days,días
+streak_weeks,weeks,semanas
+
+# Analytics & Insights
+analytics_title,Analytics,Análisis
+analytics_total_sessions,Total Sessions,Sesiones Totales
+analytics_average_quality,Average Quality,Calidad Promedio
+analytics_total_time,Total Time,Tiempo Total
+analytics_best_streak,Best Streak,Mejor Racha
+analytics_mood_correlation,Mood Correlation,Correlación del Estado de Ánimo
+analytics_tag_performance,Tag Performance,Rendimiento de Etiquetas
+analytics_keyword_analysis,Keyword Analysis,Análisis de Palabras Clave
+analytics_unlimited_history,Unlimited History,Historial Ilimitado
+
+# Pro Features
+pro_title,MindTrainer Pro,MindTrainer Pro
+pro_subtitle,Unlock Advanced Analytics,Desbloquea Análisis Avanzados
+pro_monthly,Monthly,Mensual
+pro_yearly,Yearly,Anual
+pro_save_percent,Save 20%,Ahorra 20%
+pro_free_trial,Start Free Trial,Iniciar Prueba Gratuita
+pro_upgrade,Upgrade to Pro,Actualizar a Pro
+pro_feature_mood_insights,Mood-Focus Correlations,Correlaciones Estado de Ánimo-Concentración
+pro_feature_tag_analytics,Advanced Tag Analytics,Análisis Avanzado de Etiquetas
+pro_feature_keyword_extraction,Session Keyword Analysis,Análisis de Palabras Clave de Sesión
+pro_feature_unlimited_history,Complete Session History,Historial Completo de Sesiones
+pro_feature_data_export,Export Your Data,Exportar Tus Datos
+pro_locked,Pro Feature,Característica Pro
+pro_unlock_hint,Tap to unlock with Pro,Toca para desbloquear con Pro
+
+# Billing & Purchase
+billing_processing,Processing purchase...,Procesando compra...
+billing_success,Purchase successful!,¡Compra exitosa!
+billing_cancelled,Purchase cancelled,Compra cancelada
+billing_error,Purchase failed,Compra fallida
+billing_restore,Restore Purchases,Restaurar Compras
+billing_manage,Manage Subscription,Gestionar Suscripción
+billing_cancel_anytime,Cancel anytime,Cancelar en cualquier momento
+purchase_waiting,Waiting for Google Play...,Esperando Google Play...
+purchase_pending,Purchase pending confirmation,Compra pendiente de confirmación
+purchase_check_status,Check status,Verificar estado
+purchase_timeout_message,Still waiting on Google Play... You can close this message.,Aún esperando Google Play... Puedes cerrar este mensaje.
+restore_timeout,Restore timed out. Try again.,Restauración agotó tiempo. Inténtalo de nuevo.
+
+# Mood Check-in
+mood_checkin,How are you feeling?,¿Cómo te sientes?
+mood_energetic,Energetic,Enérgico
+mood_calm,Calm,Calmado
+mood_focused,Focused,Concentrado
+mood_tired,Tired,Cansado
+mood_stressed,Stressed,Estresado
+mood_neutral,Neutral,Neutral
+
+# Settings
+settings_title,Settings,Configuración
+settings_language,Language,Idioma
+settings_system_language,System Language,Idioma del Sistema
+settings_english,English,Inglés
+settings_spanish,Spanish,Español
+settings_high_contrast,High Contrast,Alto Contraste
+settings_notifications,Notifications,Notificaciones
+settings_reminder_time,Reminder Time,Hora de Recordatorio
+settings_privacy,Privacy,Privacidad
+settings_data_export,Export Data,Exportar Datos
+settings_about,About,Acerca de
+settings_version,Version,Versión
+settings_support,Support,Soporte
+
+# Accessibility
+a11y_session_timer,Session timer,Temporizador de sesión
+a11y_quality_slider,Quality rating slider,Control deslizante de calificación de calidad
+a11y_pro_locked_feature,Pro feature locked,Característica Pro bloqueada
+a11y_menu_button,Menu button,Botón de menú
+a11y_back_button,Back button,Botón de retroceso
+a11y_close_button,Close button,Botón de cerrar
+a11y_save_button,Save button,Botón de guardar
+
+# Error Messages
+error_general,Something went wrong,Algo salió mal
+error_network,Network connection required,Se requiere conexión de red
+error_billing_unavailable,Billing service unavailable,Servicio de facturación no disponible
+error_session_save_failed,Failed to save session,Error al guardar sesión
+error_data_export_failed,Failed to export data,Error al exportar datos
+error_invalid_input,Invalid input,Entrada inválida
+
+# Toast Messages
+toast_session_saved,Session saved successfully,Sesión guardada exitosamente
+toast_goal_updated,Goal updated,Meta actualizada
+toast_settings_saved,Settings saved,Configuración guardada
+toast_pro_unlocked,Pro features unlocked!,¡Características Pro desbloqueadas!
+toast_purchase_restored,Purchase restored,Compra restaurada
+
+# Dialogs
+dialog_confirm,Confirm,Confirmar
+dialog_cancel,Cancel,Cancelar
+dialog_delete,Delete,Eliminar
+dialog_save,Save,Guardar
+dialog_discard_changes,Discard changes?,¿Descartar cambios?
+dialog_delete_session,Delete this session?,¿Eliminar esta sesión?
+dialog_reset_data,Reset all data?,¿Restablecer todos los datos?
+dialog_export_data_title,Export Data,Exportar Datos
+dialog_export_data_message,Export your session data as CSV?,¿Exportar tus datos de sesión como CSV?
+
+# Onboarding
+onboarding_step1_title,Welcome to Focus Training,Bienvenido al Entrenamiento de Concentración
+onboarding_step1_desc,Build better focus habits with guided sessions,Construye mejores hábitos de concentración con sesiones guiadas
+onboarding_step2_title,Track Your Progress,Sigue Tu Progreso
+onboarding_step2_desc,See how your focus improves over time,Ve cómo mejora tu concentración con el tiempo
+onboarding_step3_title,Achieve Your Goals,Alcanza Tus Metas
+onboarding_step3_desc,Set weekly targets and build consistency,Establece objetivos semanales y construye consistencia
+onboarding_next,Next,Siguiente
+onboarding_skip,Skip,Omitir
+onboarding_get_started,Get Started,Comenzar
+
+# Navigation
+nav_sessions,Sessions,Sesiones
+nav_analytics,Analytics,Análisis
+nav_goals,Goals,Metas
+nav_settings,Settings,Configuración
+
+# Time Formats
+time_minutes_short,min,min
+time_hours_short,hr,h
+time_seconds_short,sec,seg
+time_today,Today,Hoy
+time_yesterday,Yesterday,Ayer
+time_this_week,This Week,Esta Semana
+time_last_week,Last Week,Semana Pasada
+
+# Common Actions
+action_start,Start,Iniciar
+action_stop,Stop,Parar
+action_pause,Pause,Pausar
+action_resume,Resume,Reanudar
+action_edit,Edit,Editar
+action_delete,Delete,Eliminar
+action_share,Share,Compartir
+action_copy,Copy,Copiar
+action_done,Done,Hecho
+action_close,Close,Cerrar
+action_refresh,Refresh,Actualizar
+
+# Support & Diagnostics
+support_title,Support & Diagnostics,Soporte y Diagnósticos
+support_create_bundle,Create Support Bundle,Crear Paquete de Soporte
+support_bundle_created,Support bundle created,Paquete de soporte creado
+support_contact,Contact Support,Contactar Soporte
+support_logs,Logs,Registros
+support_export_logs,Export Logs,Exportar Registros
+diagnostics_panel,Diagnostics Panel,Panel de Diagnósticos
+diagnostics_enabled,Diagnostics enabled,Diagnósticos habilitados
+diagnostics_disabled,Diagnostics disabled,Diagnósticos deshabilitados
+
+# Focus Stats (v1 Feature)
+focus_stats_title,Focus Stats,Estadísticas de Concentración
+focus_stats_total,Total Focus Time,Tiempo Total de Concentración
+focus_stats_average,Average Session,Sesión Promedio
+focus_stats_sessions,Sessions,Sesiones
+focus_stats_minutes_unit,{minutes} min,{minutes} min
+focus_stats_saved_locally_hint,Saved locally,Guardado localmente
+
+# Home Cards & Focus Timer
+home_journal_title,Journal,Diario
+home_journal_sub,Capture what matters. Even offline.,Captura lo que importa. Incluso sin conexión.
+home_coach_title,Talk to Coach,Hablar con Coach
+home_coach_sub,Talk it out. I'll guide the next step.,Hablemos. Te guiaré al siguiente paso.
+home_focus_title,Start Focus Session,Iniciar Sesión de Concentración
+home_focus_sub,Settle in for a block.,Prepárate para un bloque.
+focus_chip_last_used,Last used,Último usado
+
+# Coach Triage
+coach_triage_wired,Wired,Nervioso
+coach_triage_stuck,Stuck,Atascado
+coach_triage_low,Low,Bajo
+coach_triage_cant_sleep,Can't sleep,No puedo dormir
+
+# PRO Features
+pro_soft_lock_cta,Preview → Upgrade,Vista previa → Actualizar

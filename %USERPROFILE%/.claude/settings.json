@@ -1,0 +1,6 @@
+{
+  "statusLine": {
+    "type": "command",
+    "command": "input=$(cat); printf \"Claude Code [$(echo \"$input\" | jq -r '.model.display_name')] in $(echo \"$input\" | jq -r '.workspace.current_dir' | sed 's|.*/||') \""
+  }
+}

@@ -1,0 +1,1 @@
+This is a placeholder for emergency_voice_activation_notes.md

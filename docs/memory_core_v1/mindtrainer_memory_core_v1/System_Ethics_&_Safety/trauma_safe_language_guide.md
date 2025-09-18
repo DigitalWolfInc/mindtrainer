@@ -1,0 +1,1 @@
+This is a placeholder for trauma_safe_language_guide.md

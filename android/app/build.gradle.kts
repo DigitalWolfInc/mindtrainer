@@ -6,9 +6,9 @@ plugins {
 }
 
 android {
-    namespace = "com.mindtrainer.app"
+    namespace = "com.example.mindtrainer"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.mindtrainer.app"
+        applicationId = "com.example.mindtrainer"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
@@ -41,4 +41,12 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    // Google Play Billing Library for subscription management
+    implementation("com.android.billingclient:billing-ktx:6.1.0")
+    
+    // Coroutines support for async billing operations
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 }
