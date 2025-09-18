@@ -1,0 +1,13 @@
+{
+  "grid": { "rows": 5, "cols": 5, "cellW": 409, "cellH": 409 },
+  "pages": {
+    "animals_page1.png": {
+      "fox": { "row": 0 },
+      "goose": { "row": 1 },
+      "bear": { "row": 2 },
+      "turtle": { "row": 3 },
+      "rabbit": { "row": 4 }
+    }
+  },
+  "moods": ["happy", "sad", "angry", "confused", "scared"]
+}

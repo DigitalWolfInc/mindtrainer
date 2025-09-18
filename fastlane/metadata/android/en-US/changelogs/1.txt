@@ -1,0 +1,10 @@
+Initial release of Mind Trainer!
+
+Features:
+• Comprehensive mental training exercises
+• Guided mindfulness sessions
+• Progress tracking and analytics
+• Achievement system
+• Emergency calm mode
+
+All features work offline and your data stays private by default.
